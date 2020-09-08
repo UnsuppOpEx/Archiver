@@ -18,5 +18,7 @@ public class Archiver {
         String line2 = bufferedReader.readLine();
         Path path2 = Paths.get(line2);
         zipFileManager.createZip(path2);
+
+        new ExitCommand().execute();
     }
 }

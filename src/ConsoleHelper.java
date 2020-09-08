@@ -5,7 +5,7 @@ import java.io.InputStreamReader;
 /**
  * Класс для работы с консолью
  */
-public class ConsoleHelper {
+public class  ConsoleHelper {
     private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
     /**
@@ -26,7 +26,7 @@ public class ConsoleHelper {
         try {
             line = reader.readLine();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Произошла ошибка при попытке ввода текста. Попробуйте еще раз.");
         }
         return line;
     }
@@ -39,9 +39,9 @@ public class ConsoleHelper {
         int value = 0;
 
         try {
-            value = Integer.parseInt(reader.readLine());
+            value = Integer.parseInt(reader.readLine().trim());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Произошла ошибка при попытке ввода числа. Попробуйте еще раз.");
         }
         return value;
     }
