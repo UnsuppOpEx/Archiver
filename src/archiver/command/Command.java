@@ -1,4 +1,4 @@
-package command;
+package archiver.command;
 
 /**
  * Интерфейс для команд

@@ -1,4 +1,6 @@
-import command.Command;
+package archiver.command;
+
+import archiver.ConsoleHelper;
 
 /**
  * Класс для команды EXIT
