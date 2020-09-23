@@ -1,28 +1,60 @@
 package archiver;
 
-import archiver.command.ExitCommand;
+import archiver.exception.WrongZipFileException;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Archiver {
-
     public static void main(String[] args) throws Exception {
 
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        Operation operation = null;
+        do {
+            try {
+                operation = askOperation();
+                CommandExecutor.execute(operation);
+            } catch (WrongZipFileException e) {
+                ConsoleHelper.writeMessage("Вы не выбрали файл архива или выбрали неверный файл.");
+            } catch (Exception e) {
+                ConsoleHelper.writeMessage("Произошла ошибка. Проверьте введенные данные.");
+            }
 
-        System.out.println("Введите полный путь к архиву:");
-        String line1 = bufferedReader.readLine();
-        Path path = Paths.get(line1);
-        ZipFileManager zipFileManager = new ZipFileManager(path);
+        } while (operation != Operation.EXIT);
+    }
 
-        System.out.println("Введите путь к архивируемому файлу:");
-        String line2 = bufferedReader.readLine();
-        Path path2 = Paths.get(line2);
-        zipFileManager.createZip(path2);
+//        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+//
+//        System.out.println("Введите полный путь к архиву:");
+//        String line1 = bufferedReader.readLine();
+//        Path path = Paths.get(line1);
+//        ZipFileManager zipFileManager = new ZipFileManager(path);
+//
+//        System.out.println("Введите путь к архивируемому файлу:");
+//        String line2 = bufferedReader.readLine();
+//        Path path2 = Paths.get(line2);
+//        zipFileManager.createZip(path2);
+//
+//        new ExitCommand().execute();
 
-        new ExitCommand().execute();
+
+    /**
+     * Выводит список доступных команд и возвращает выбранную.
+     * @return
+     * @throws IOException
+     */
+    public static Operation askOperation() throws IOException {
+        ConsoleHelper.writeMessage("");
+        ConsoleHelper.writeMessage("Выберите операцию:");
+        ConsoleHelper.writeMessage(String.format("\t %d - упаковать файлы в архив", Operation.CREATE.ordinal()));
+        ConsoleHelper.writeMessage(String.format("\t %d - добавить файл в архив", Operation.ADD.ordinal()));
+        ConsoleHelper.writeMessage(String.format("\t %d - удалить файл из архива", Operation.REMOVE.ordinal()));
+        ConsoleHelper.writeMessage(String.format("\t %d - распаковать архив", Operation.EXTRACT.ordinal()));
+        ConsoleHelper.writeMessage(String.format("\t %d - просмотреть содержимое архива", Operation.CONTENT.ordinal()));
+        ConsoleHelper.writeMessage(String.format("\t %d - выход", Operation.EXIT.ordinal()));
+
+        return Operation.values()[ConsoleHelper.readInt()];
     }
 }
