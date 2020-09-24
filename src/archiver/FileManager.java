@@ -31,14 +31,16 @@ public class FileManager {
      */
     private void collectFileList(Path path) throws IOException {
 
+        //Вычисляем относительный путь файла
         if (Files.isRegularFile(path)) {
-            fileList.add(rootPath.relativize(path));    //Вычисляем относительный путь файла
+            fileList.add(rootPath.relativize(path));
         }
 
+        //Применяем рекурсиооный метод поиска
         if (Files.isDirectory(path)) {
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
                 for (Path entry : stream) {
-                    collectFileList(entry);     //Применяем рекурсиооный метод поиска
+                    collectFileList(entry);
                 }
             }
         }

@@ -1,9 +1,12 @@
 package archiver;
 
+import archiver.exception.PathIsNotFoundException;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -15,30 +18,69 @@ public class ZipFileManager {
         this.zipFile = zipFile;
     }
 
-    /**
-     * Создает архив если он не создан,
-     * считывает данные из файла и записывает в архив.
-     * @param source
-     * @throws Exception
-     */
     public void createZip(Path source) throws Exception {
-        try (OutputStream out = Files.newOutputStream(zipFile);
-             InputStream input = Files.newInputStream(source)) {
+        // Проверяем, существует ли директория, где будет создаваться архив
+        // При необходимости создаем ее
+        Path zipDirectory = zipFile.getParent();
+        if (Files.notExists(zipDirectory))
+            Files.createDirectories(zipDirectory);
 
-            ZipOutputStream zos = new ZipOutputStream(out);
+        // Создаем zip поток
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(zipFile))) {
 
-            entry = new ZipEntry(source.getFileName().toString());
-            zos.putNextEntry(entry);
+            if (Files.isDirectory(source)) {
+                // Если архивируем директорию, то нужно получить список файлов в ней
+                FileManager fileManager = new FileManager(source);
+                List<Path> fileNames = fileManager.getFileList();
 
+                // Добавляем каждый файл в архив
+                for (Path fileName : fileNames)
+                    addNewZipEntry(zipOutputStream, source, fileName);
 
-            for (int c = input.read(); c != -1; c = input.read()) {
-                zos.write(c);
+            } else if (Files.isRegularFile(source)) {
+
+                // Если архивируем отдельный файл, то нужно получить его директорию и имя
+                addNewZipEntry(zipOutputStream, source.getParent(), source.getFileName());
+            } else {
+
+                // Если переданный source не директория и не файл, бросаем исключение
+                throw new PathIsNotFoundException();
             }
-            zos.flush();
-            zos.close();
-//            zos.closeEntry();
-
         }
     }
 
+    /**
+     * Добавляет элемент архива
+     * @param zipOutputStream
+     * @param filePath
+     * @param fileName
+     * @throws Exception
+     */
+    private void addNewZipEntry(ZipOutputStream zipOutputStream, Path filePath, Path fileName) throws Exception {
+        Path fullPath = filePath.resolve(fileName);
+        try (InputStream inputStream = Files.newInputStream(fullPath)) {
+            ZipEntry entry = new ZipEntry(fileName.toString());
+
+            zipOutputStream.putNextEntry(entry);
+
+            copyData(inputStream, zipOutputStream);
+
+            zipOutputStream.closeEntry();
+        }
+    }
+
+    /**
+     * Читать данные из in и записывать в out, пока не вычитает все.
+     * @param in
+     * @param out
+     * @throws Exception
+     */
+    private void copyData(InputStream in, OutputStream out) throws Exception {
+        byte[] buffer = new byte[8 * 1024];
+        int len;
+        while ((len = in.read(buffer)) > 0) {
+            out.write(buffer, 0, len);
+        }
+    }
 }
+
