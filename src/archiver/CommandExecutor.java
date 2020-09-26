@@ -28,25 +28,7 @@ public class CommandExecutor {
     }
 
     public static void execute(Operation operation) throws Exception {
-        for(Map.Entry<Operation, Command> value : allKnownCommandsMap.entrySet()) {
-            if(value.getKey() == Operation.CREATE) {
-                value.getValue().execute();
-
-            } else if (value.getKey() == Operation.ADD) {
-                value.getValue().execute();
-
-            } else if(value.getKey() == Operation.REMOVE) {
-                value.getValue().execute();
-
-            } else if(value.getKey() == Operation.EXTRACT) {
-                value.getValue().execute();
-
-            } else if(value.getKey() == Operation.CONTENT) {
-                value.getValue().execute();
-
-            } else if(value.getKey() == Operation.EXIT) {
-                value.getValue().execute();
-            }
+        allKnownCommandsMap.get(operation).execute();
         }
     }
-}
+
