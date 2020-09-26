@@ -57,7 +57,8 @@ public class ZipFileManager {
      * @throws Exception
      */
     private void addNewZipEntry(ZipOutputStream zipOutputStream, Path filePath, Path fileName) throws Exception {
-        Path fullPath = filePath.resolve(fileName);
+        Path fullPath = filePath.resolve(fileName);   //Склеивает 2 пути
+
         try (InputStream inputStream = Files.newInputStream(fullPath)) {
             ZipEntry entry = new ZipEntry(fileName.toString());
 
