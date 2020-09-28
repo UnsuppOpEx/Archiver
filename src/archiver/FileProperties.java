@@ -45,7 +45,7 @@ public class FileProperties {
     public String toString() {
 
         if(size > 0)
-            return String.format("%s %d Kb (%d Kb) сжатие: %d%%", getName(), getSize() / 1024, getCompressedSize() / 1024, getCompressionRatio());
+            return String.format("%s %d Kb (%d K  b) сжатие: %d%%", getName(), getSize() / 1024, getCompressedSize() / 1024, getCompressionRatio());
 
         else
             return name;
